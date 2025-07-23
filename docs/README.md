@@ -1,21 +1,24 @@
-# Infrastructure as Code (IaC) Documentation
+# Infrastructure as Code (IaC) Developer Documentation
 
-Welcome to the IaC project documentation. This directory contains comprehensive documentation for deploying web applications to Oracle Cloud Infrastructure using Python-based automation tools.
+Welcome to the comprehensive developer documentation for the Infrastructure as Code project. This documentation provides detailed information for developers, contributors, and those wanting to understand the project architecture.
+
+> 🚀 **For quick deployment and basic usage**: See the [main README.md](../README.md)
 
 ## 📋 Documentation Overview
 
-This documentation is organized to help both users and developers understand, deploy, and contribute to the Infrastructure as Code project.
+This documentation is organized for developers and contributors who need deep understanding of the project structure, architecture, and development processes.
 
 ### For Users (Getting Started)
 - **Quick Deployment**: Follow the [main README.md](../README.md) for immediate deployment
-- **Configuration Guide**: See [Configuration Management](#configuration-management) section
-- **Troubleshooting**: Common issues and solutions in the main README
+- **Basic Usage**: See main README for common deployment commands
+- **Troubleshooting**: Basic issues covered in main README
 
-### For Developers (Contributing)
-- **Architecture Overview**: Understanding the codebase structure
-- **Implementation Status**: What's implemented vs. what's planned
-- **Development Setup**: Local development environment setup
-- **Testing Guidelines**: How to test infrastructure code
+### For Developers (Deep Dive)
+- **Architecture Overview**: Complete system design and component relationships
+- **Implementation Status**: Detailed tracking of what's implemented vs. planned
+- **Development Setup**: Comprehensive local development environment setup
+- **Testing Guidelines**: Complete testing strategies and frameworks
+- **Contributing**: Code standards, review processes, and contribution workflows
 
 ## 🏗️ Repository Structure Guide
 
@@ -120,7 +123,7 @@ uv sync
 uv run oci-deploy deploy --environment dev --image-tag latest
 ```
 
-### For Developers - Set Up Development Environment
+### For Developers - Comprehensive Development Setup
 ```bash
 # 1. Clone and navigate
 git clone <repository-url>
@@ -136,9 +139,95 @@ uv run pytest
 uv run black src/ tests/
 uv run flake8 src/ tests/
 uv run mypy src/
+
+# 5. Install pre-commit hooks (recommended)
+uv run pre-commit install
+
+# 6. Run comprehensive test suite
+uv run pytest --cov=src/oci_deploy --cov-report=html
+
+# 7. Validate deployment configuration
+uv run oci-deploy config-check --environment dev
+```
+
+### For Developers - Advanced Development Tasks
+```bash
+# Development workflow commands
+uv run black src/ scripts/ tests/     # Code formatting
+uv run isort src/ scripts/ tests/     # Import sorting  
+uv run flake8 src/ scripts/           # Linting
+uv run mypy src/ scripts/             # Type checking
+
+# Add new dependencies
+uv add package-name                   # Production dependency
+uv add --dev package-name            # Development dependency
+uv remove package-name               # Remove dependency
+uv lock                              # Update lock file
+
+# Testing and validation
+uv run pytest tests/ -v              # Verbose test output
+uv run pytest --cov=src --cov-report=html    # Coverage report
+uv run pytest tests/integration/ --oci-integration  # Integration tests
+
+# Configuration and validation
+uv run scripts/validate-config.py --config config/config.yaml
+uv run scripts/generate-configs.py --template config/template.yaml
+uv run scripts/test-connection.py --environment dev
 ```
 
 ## 🔧 Configuration Management
+
+### Environment Variables
+
+The deployment scripts use environment variables for sensitive configuration:
+
+```bash
+# Oracle Cloud Infrastructure Configuration
+export OCI_CONFIG_FILE=~/.oci/config
+export OCI_CONFIG_PROFILE=DEFAULT
+export OCI_COMPARTMENT_ID=ocid1.compartment.oc1..your-compartment-id
+
+# Deployment Configuration
+export DEPLOYMENT_REGION=us-ashburn-1
+export DEPLOYMENT_ENVIRONMENT=dev
+export LOG_LEVEL=INFO
+
+# Application-Specific Variables
+export APP_NAME=my-web-app
+export DOMAIN_NAME=example.com
+export SSL_CERTIFICATE_PATH=/path/to/ssl/cert
+```
+
+### Configuration Files
+
+Create environment-specific YAML configuration files:
+
+```yaml
+# config/environments/dev.yaml
+environment: dev
+region: us-ashburn-1
+compartment_id: ocid1.compartment.oc1..your-compartment-id
+
+resources:
+  compute:
+    shape: VM.Standard.E3.Flex
+    memory_gb: 4
+    cpu_count: 2
+  
+  storage:
+    bucket_name: my-app-dev-static
+    public_access: true
+  
+  networking:
+    vcn_cidr: "10.0.0.0/16"
+    subnet_cidr: "10.0.1.0/24"
+
+application:
+  type: react-vite
+  build_command: "pnpm build"
+  dist_directory: "dist"
+  port: 3000
+```
 
 ### Environment Files
 Configuration is managed through environment-specific `.env` files:
@@ -170,6 +259,59 @@ uv run pytest tests/test_containers.py
 
 # With coverage
 uv run pytest --cov=src/oci_deploy --cov-report=html
+
+# Integration tests (requires OCI access)
+uv run pytest tests/integration/ --oci-integration
+
+# Dry run testing (no actual resource creation)
+uv run deploy.py --environment dev --dry-run --source-path ../test-app
+uv run scripts/validate-deployment.py --config config/dev-config.yaml
+uv run scripts/test-provisioning.py --environment test --mock
+```
+
+## 🚀 Deployment Operations
+
+### Production Deployment
+
+```bash
+# Deploy to production environment
+uv run deploy.py --environment prod --app-type react-vite --source-path ../my-app --confirm
+
+# Deploy with specific resource specifications
+uv run deploy.py --environment prod --config config/prod-config.yaml --scaling-policy auto
+
+# Deploy static assets only (faster updates)
+uv run deploy.py --environment prod --static-only --source-path ../my-app/dist
+```
+
+### Rollback and Recovery
+
+```bash
+# List available deployment versions
+uv run scripts/list-deployments.py --environment prod
+
+# Rollback to previous version
+uv run scripts/rollback.py --environment prod --version v1.2.0
+
+# Emergency cleanup (removes all resources)
+uv run scripts/cleanup.py --environment dev --force
+```
+
+### Advanced Deployment Scenarios
+
+```bash
+# Multi-environment deployment
+uv run deploy.py --environment staging --image-tag v1.0.0
+uv run deploy.py --environment prod --image-tag v1.0.0
+
+# Container-only deployment (skip static assets)
+uv run deploy.py --environment dev --container-only --image-tag latest
+
+# Static-only deployment (skip containers)
+uv run deploy.py --environment dev --static-only --source-path ../my-app/dist
+
+# Deployment with custom configuration
+uv run deploy.py --environment prod --config custom-prod-config.yaml
 ```
 
 ## 🏗️ Architecture Overview
