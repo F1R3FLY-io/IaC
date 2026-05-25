@@ -14,7 +14,9 @@
 - Format: `uv run black .` and `uv run isort .`
 - Type Check: `uv run mypy .`
 - Quick script execution: `uvx script-name` for standalone scripts
-- DO NOT ever `git add` or `git commit` code. Allow the Claude user to always manually review changes.
+- Use the `/quick-commit` slash command for git add/commit operations; use the `/recursive-push` command for git push operations. Do not run `git add`, `git commit`, or `git push` directly unless explicitly requested.
+- `git mv` is permitted but requires user confirmation.
+- Never discard user changes; avoid destructive git commands.
 - DO NOT ever remove tests from linting or type checks.
 - Run `uv run pytest && uv run flake8 .` to test code changes before proceeding to next task.
 - DO NOT execute deployment scripts without explicit user permission.
@@ -54,3 +56,7 @@
 - Work with the user to develop deployment strategies using a test-driven approach
 - Leverage uv's fast dependency resolution and package management
 - Use `uv lock` to ensure reproducible builds across environments
+
+## Attributions
+
+- Do not include any references to Claude co-authoring commits or code.
